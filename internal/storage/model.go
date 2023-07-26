@@ -7,6 +7,7 @@ type SArticle struct {
 
 	// Source пока только в rss формате
 	Source  string
+	Title   string
 	Content string
 
 	Summary     string
@@ -36,11 +37,12 @@ func NewUser(username, tgid string) *User {
 	}
 }
 
-func NewArticle(link, content string) *SArticle {
+func NewArticle(link, content string, title string) *SArticle {
 	return &SArticle{
 		Source:      link,
 		Content:     content,
 		DateCreated: time.Now(),
 		HasSummary:  false,
+		Title:       title,
 	}
 }

@@ -2,6 +2,11 @@ package storage
 
 import (
 	"context"
+	"errors"
+)
+
+var (
+	ErrDuplicate = errors.New("provided entity is a duplicate")
 )
 
 type SummerStorage interface {
@@ -13,8 +18,9 @@ type SummerStorage interface {
 	RemoveKeyword(ctx context.Context, tgid, keyword string) error
 
 	GetAllSources(ctx context.Context) ([]string, error)
-	AddArticle(ctx context.Context, link, content string) (*SArticle, error)
+	AddArticle(ctx context.Context, link, content string, title string) (*SArticle, error)
 
+	GetArticleByTitle(ctx context.Context, title string) (*SArticle, error)
 	GetArticleByID(ctx context.Context, id int) (*SArticle, error)
 	AddSummary(ctx context.Context, articleID int, summary string) error
 

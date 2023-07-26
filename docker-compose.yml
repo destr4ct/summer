@@ -1,6 +1,7 @@
 version: "3.7"
 services:
   queue-provider:
+    hostname: 'queue-provider'
     image: rabbitmq:3
     container_name: queue-provider
 
@@ -11,6 +12,9 @@ services:
     restart: unless-stopped
     networks:
       - app-net
+
+    volumes:
+      - mbt:/var/lib/rabbitmq/mnesia/
 
   producer-consumer:
     container_name: pc
@@ -57,4 +61,6 @@ networks:
 
 volumes:
   dbv:
+    driver: local
+  mbt:
     driver: local

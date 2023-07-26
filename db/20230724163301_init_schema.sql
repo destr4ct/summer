@@ -22,15 +22,19 @@ CREATE TABLE source (
 
     FOREIGN KEY (owner_id) REFERENCES summer_user (user_id) ON DELETE CASCADE
 );
+
 CREATE TABLE article (
     article_id SERIAL PRIMARY KEY,
-    source text,
+    source text, -- source в формате kind:link
     content text,
+    title text,
     summary text,
     date_created TIMESTAMP,
 
     has_summary boolean
 );
+CREATE UNIQUE INDEX article_idx ON article (title);
+
 -- +goose StatementEnd
 -- +goose Down
 -- +goose StatementBegin

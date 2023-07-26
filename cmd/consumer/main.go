@@ -3,11 +3,14 @@ package main
 import (
 	"context"
 	"destr4ct/summer/internal/config"
+	"destr4ct/summer/internal/queue"
 	"destr4ct/summer/internal/queue/rmq"
 	"destr4ct/summer/internal/storage/postgres"
 	"destr4ct/summer/pkg/logging"
+	"fmt"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 )
 
@@ -35,9 +38,27 @@ func main() {
 	logger.Info("initialized the storage")
 
 	ctx, cancel := context.WithCancel(context.Background())
-	_ = ctx
-	_ = storage
 
-	<-exitSignal
-	cancel()
+	for {
+		select {
+		case <-exitSignal:
+			cancel()
+		default:
+			bCtx, timeout := context.WithTimeout(ctx, cfg.Delay)
+
+			//logger.Info("consumer: getting the messages")
+			messages, err := broker.GetMessages(bCtx, queue.SummerKey)
+			if err != nil {
+				logger.Error("failed to get messages", err)
+			}
+
+			for _, m := range messages {
+				// TODO: это лишь симуляция для проверки crawler, нужно поменять потом все к чертям
+				aID, _ := strconv.Atoi(m.Message)
+				_ = storage.AddSummary(ctx, aID, fmt.Sprintf("test summary for %d", aID))
+			}
+
+			timeout()
+		}
+	}
 }

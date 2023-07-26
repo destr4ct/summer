@@ -7,6 +7,7 @@ import (
 	"destr4ct/summer/pkg/utils"
 	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"sync"
 	"time"
 )
 
@@ -18,6 +19,7 @@ var con *amqp.Connection
 type RabbitBroker struct {
 	con *amqp.Connection
 	ch  *amqp.Channel
+	mut sync.Mutex
 }
 
 // renewChannel открывает новый канал, если прошлый по каким-то причинам не был открыт/закрылся
@@ -37,6 +39,9 @@ func (rb *RabbitBroker) queueByKey(key string) (amqp.Queue, error) {
 
 // SendMessage просто отправляет в заданную очередь наше сообщение. Никаких хитростей
 func (rb *RabbitBroker) SendMessage(ctx context.Context, key string, msg queue.Message[any]) error {
+	rb.mut.Lock()
+	defer rb.mut.Unlock()
+
 	q, err := rb.queueByKey(key)
 	if err != nil {
 		return err
@@ -54,10 +59,14 @@ func (rb *RabbitBroker) SendMessage(ctx context.Context, key string, msg queue.M
 			ContentType: "text/plain",
 		},
 	)
+
 }
 
 // GetMessages получает сообщения до тех пор, пока не будет сигнала от контекста на прекращение чтения
 func (rb *RabbitBroker) GetMessages(ctx context.Context, key string) ([]*queue.Message[time.Time], error) {
+	rb.mut.Lock()
+	defer rb.mut.Unlock()
+
 	messages := make([]*queue.Message[time.Time], 0, 8)
 
 	q, err := rb.queueByKey(key)

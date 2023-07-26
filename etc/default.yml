@@ -1,4 +1,6 @@
 env: "dev" # dev, prod
+delay: 10s
+max_workers: 3
 
 broker:
   host: "queue-provider"

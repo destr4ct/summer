@@ -35,7 +35,7 @@ func main() {
 	}
 	logger.Info("initialized the storage")
 
-	service := crawler.GetService(logger, storage, broker)
+	service := crawler.GetService(logger, storage, broker, cfg.MaxWorkers)
 	logger.Info("starting the crawler")
 
 	ctx, cancel := context.WithCancel(context.Background())

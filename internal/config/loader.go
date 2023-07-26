@@ -21,8 +21,9 @@ func init() {
 }
 
 type Config struct {
-	Env   string        `yaml:"env" env:"ENV" env-default:"dev"`
-	Delay time.Duration `yaml:"delay" env:"DELAY" env-default:"1h"`
+	Env        string        `yaml:"env" env:"ENV" env-default:"dev"`
+	Delay      time.Duration `yaml:"delay" env:"DELAY" env-default:"1h"`
+	MaxWorkers int           `yaml:"max_workers" env:"MAX_WORKERS" env-default:"2"`
 
 	BrokerConfig   BrokerConfig   `yaml:"broker"`
 	TelegramConfig TelegramConfig `yaml:"telegram"`
