@@ -1,0 +1,10 @@
+env: "dev" # dev, prod
+
+broker:
+  host: "queue-provider"
+  port: 5672
+
+db:
+  host: "db"
+  port: 5432
+  db_name: "postgres"

@@ -1,0 +1,60 @@
+version: "3.7"
+services:
+  queue-provider:
+    image: rabbitmq:3
+    container_name: queue-provider
+
+    environment:
+      - RABBITMQ_DEFAULT_USER=summer
+      - RABBITMQ_DEFAULT_PASS=SuperSecure
+
+    restart: unless-stopped
+    networks:
+      - app-net
+
+  producer-consumer:
+    container_name: pc
+    build:
+      dockerfile: ./opt/pc/Dockerfile
+      context: ./
+
+    restart: unless-stopped
+    networks:
+      - app-net
+    depends_on:
+      - queue-provider
+
+  telegram:
+    container_name: telegram
+    build:
+      dockerfile: ./opt/telegram/Dockerfile
+      context: ./
+    restart: unless-stopped
+    environment:
+      - TG_API_KEY=${TG_API_KEY}
+    networks:
+      - app-net
+
+  db:
+    container_name: db
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_USER=summer
+      - POSTGRES_PASSWORD=SuperSecure
+      - POSTGRES_DB=postgres
+    volumes:
+      - dbv:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - app-net
+
+
+networks:
+  app-net:
+    name: summer-net
+    driver: bridge
+
+volumes:
+  dbv:
+    driver: local
